@@ -13,6 +13,7 @@
 #define _SIMPLEQUEUE_H_
 
 #include <string>
+#include<pthread.h>
 
 using std::string;
 
@@ -45,6 +46,7 @@ class SimpleQueue {
     node *next;
   } *front, *end;
   int size;
+  mutable pthread_mutex_t lock;
 };  // class SimpleQueue
 
 #endif  // _SIMPLEQUEUE_H_
