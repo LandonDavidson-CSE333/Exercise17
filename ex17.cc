@@ -1,13 +1,5 @@
-/*
- * Copyright ©2025 Hal Perkins.  All rights reserved.  Permission is
- * hereby granted to students registered for University of Washington
- * CSE 333 for use solely during Winter Quarter 2025 for purposes of
- * the course.  No other use, copying, distribution, or modification
- * is permitted without prior written consent. Copyrights for
- * third-party components of this work must be honored.  Instructors
- * interested in reusing these course materials should contact the
- * author.
- */
+// Copyright 2025 Landon Davidson
+// landond@uw.edu
 
 #include <iostream>
 #include <thread>
@@ -86,7 +78,8 @@ int main(int argc, char **argv) {
   // Attempt to create Apple pie producer thread
   pthread_t apple_thr;
   string apple_arg = "Apple";
-  if (pthread_create(&apple_thr, nullptr, concurrent_producer, &apple_arg) != 0) {
+  if (pthread_create(&apple_thr, nullptr,
+                     concurrent_producer, &apple_arg) != 0) {
     pthread_mutex_destroy(&write_lock);
     return EXIT_FAILURE;
   }
@@ -94,12 +87,23 @@ int main(int argc, char **argv) {
   // Attempt to create Blackberry pie producer thread
   pthread_t blackberry_thr;
   string blackberry_arg = "Blackberry";
-  if (pthread_create(&blackberry_thr, nullptr, concurrent_producer, &blackberry_arg) != 0) {
+  if (pthread_create(&blackberry_thr, nullptr,
+                     concurrent_producer, &blackberry_arg) != 0) {
     pthread_mutex_destroy(&write_lock);
     return EXIT_FAILURE;
   }
 
-  consumer();
+  // Attempt to create consumer thread
+  pthread_t consumer_thr;
+  if (pthread_create(&consumer_thr, nullptr, concurrent_consumer, nullptr) != 0) {
+    pthread_mutex_destroy(&write_lock);
+    return EXIT_FAILURE;
+  }
+
+  // Join the threads and exit
+  pthread_join(apple_thr, nullptr);
+  pthread_join(blackberry_thr, nullptr);
+  pthread_join(consumer_thr, nullptr);
 
   pthread_mutex_destroy(&write_lock);
   return EXIT_SUCCESS;
