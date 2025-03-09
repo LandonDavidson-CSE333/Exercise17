@@ -67,12 +67,38 @@ void consumer() {
   }
 }
 
+void *concurrent_producer(void *arg) {
+  string pie_type = *static_cast<string*>(arg);
+  producer(pie_type);
+  return arg;
+}
+
+void *concurrent_consumer(void *arg) {
+  consumer();
+  return arg;
+}
+
 int main(int argc, char **argv) {
   pthread_mutex_init(&write_lock, NULL);
   // Your task: Make the two producers and the single consumer
   // all run concurrently (hint: use pthreads)
-  producer("Apple");
-  producer("Blackberry");
+
+  // Attempt to create Apple pie producer thread
+  pthread_t apple_thr;
+  string apple_arg = "Apple";
+  if (pthread_create(&apple_thr, nullptr, concurrent_producer, &apple_arg) != 0) {
+    pthread_mutex_destroy(&write_lock);
+    return EXIT_FAILURE;
+  }
+
+  // Attempt to create Blackberry pie producer thread
+  pthread_t blackberry_thr;
+  string blackberry_arg = "Blackberry";
+  if (pthread_create(&blackberry_thr, nullptr, concurrent_producer, &blackberry_arg) != 0) {
+    pthread_mutex_destroy(&write_lock);
+    return EXIT_FAILURE;
+  }
+
   consumer();
 
   pthread_mutex_destroy(&write_lock);
