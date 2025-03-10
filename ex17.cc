@@ -59,12 +59,14 @@ void consumer() {
   }
 }
 
+// Wrapper function to make the producer function callable by pthread_create
 void *concurrent_producer(void *arg) {
   string pie_type = *static_cast<string*>(arg);
   producer(pie_type);
   return arg;
 }
 
+// Wrapper function to make the consumer function callable by pthread_create
 void *concurrent_consumer(void *arg) {
   consumer();
   return arg;
@@ -80,6 +82,7 @@ int main(int argc, char **argv) {
   string apple_arg = "Apple";
   if (pthread_create(&apple_thr, nullptr,
                      concurrent_producer, &apple_arg) != 0) {
+    // If pthread_create fails print an error, destroy the lock, and fail
     std::cerr << "Failed to create Apple pie thread" << std::endl;
     pthread_mutex_destroy(&write_lock);
     return EXIT_FAILURE;
@@ -90,6 +93,7 @@ int main(int argc, char **argv) {
   string blackberry_arg = "Blackberry";
   if (pthread_create(&blackberry_thr, nullptr,
                      concurrent_producer, &blackberry_arg) != 0) {
+    // If pthread_create fails print an error, destroy the lock, and fail
     std::cerr << "Failed to create Blackberry pie thread" << std::endl;
     pthread_mutex_destroy(&write_lock);
     return EXIT_FAILURE;
@@ -98,6 +102,7 @@ int main(int argc, char **argv) {
   // Attempt to create consumer thread
   pthread_t consumer_thr;
   if (pthread_create(&consumer_thr, nullptr, concurrent_consumer, nullptr) != 0) {
+    // If pthread_create fails print an error, destroy the lock, and fail
     std::cerr << "Failed to create consumer thread" << std::endl;
     pthread_mutex_destroy(&write_lock);
     return EXIT_FAILURE;
