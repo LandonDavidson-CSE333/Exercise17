@@ -80,6 +80,7 @@ int main(int argc, char **argv) {
   string apple_arg = "Apple";
   if (pthread_create(&apple_thr, nullptr,
                      concurrent_producer, &apple_arg) != 0) {
+    std::cerr << "Failed to create Apple pie thread" << std::endl;
     pthread_mutex_destroy(&write_lock);
     return EXIT_FAILURE;
   }
@@ -89,6 +90,7 @@ int main(int argc, char **argv) {
   string blackberry_arg = "Blackberry";
   if (pthread_create(&blackberry_thr, nullptr,
                      concurrent_producer, &blackberry_arg) != 0) {
+    std::cerr << "Failed to create Blackberry pie thread" << std::endl;
     pthread_mutex_destroy(&write_lock);
     return EXIT_FAILURE;
   }
@@ -96,6 +98,7 @@ int main(int argc, char **argv) {
   // Attempt to create consumer thread
   pthread_t consumer_thr;
   if (pthread_create(&consumer_thr, nullptr, concurrent_consumer, nullptr) != 0) {
+    std::cerr << "Failed to create consumer thread" << std::endl;
     pthread_mutex_destroy(&write_lock);
     return EXIT_FAILURE;
   }
